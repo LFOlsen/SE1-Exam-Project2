@@ -1,4 +1,4 @@
-package dtu.planning.app;
+package dtu.planning.application;
 
 public class PlanningTool {
     /**

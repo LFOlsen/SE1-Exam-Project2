@@ -1,6 +1,6 @@
 package dtu.planning.db;
 
-public class BackEnd {
+public class ReadWriteJSON {
     /**
      * Package for JSON-IO methods
      */
