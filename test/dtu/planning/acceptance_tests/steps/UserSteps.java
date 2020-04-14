@@ -1,14 +1,14 @@
 package dtu.planning.acceptance_tests.steps;
 
-import dtu.planning.app.PlanningTool;
+import dtu.planning.application.PlanningTool;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
-public class ListSteps {
+public class UserSteps {
     private PlanningTool planningTool;
 
-    public ListSteps(PlanningTool planningTool) {
+    public UserSteps(PlanningTool planningTool) {
         this.planningTool = planningTool;
     }
 
