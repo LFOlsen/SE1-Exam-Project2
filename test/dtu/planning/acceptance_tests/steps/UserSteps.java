@@ -12,6 +12,12 @@ public class UserSteps {
         this.planningTool = planningTool;
     }
 
+    @Given("a developer is registered with the planningTool")
+    public void aDeveloperIsRegisteredWithThePlanningTool() {
+        // Write code here that turns the phrase above into concrete actions
+        throw new io.cucumber.java.PendingException();
+    }   
+
     @Given("the client is registered with the planningTool")
     public void theClientIsRegisteredWithThePlanningTool() {
         // Write code here that turns the phrase above into concrete actions
