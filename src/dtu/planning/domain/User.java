@@ -12,14 +12,11 @@ public abstract class User {
     }
 
     private boolean hasProjectActivitiesInWeek(int week) {
-        return userInfo.numberOfProjectActivitiesByWeekNumber.containsKey(week);
+        return userInfo.numberOfProjectActivitiesByWeekNumber.getOrDefault(week, 0) > 0;
     }
 
     private boolean hasMaxProjectActivitiesInWeek(int week) {
-        if (userInfo.numberOfProjectActivitiesByWeekNumber.containsKey(week)) {
-            return (userInfo.numberOfProjectActivitiesByWeekNumber.get(week) > MAX_WEEKLY_PROJECT_ACTIVITIES);
-        }
-        return false;
+        return userInfo.numberOfProjectActivitiesByWeekNumber.getOrDefault(week, 0) > MAX_WEEKLY_PROJECT_ACTIVITIES;
     }
 
     private boolean hasRegularActivityInWeek(int week) {
@@ -30,13 +27,33 @@ public abstract class User {
         return (userInfo.regularActivityByWeekNumber.get(week) == type);
     }
 
-    public boolean hasAnyActivitiesInPeriod(Date date) {
+    public void addProjectActivity(Date date) {
         for (Integer week : date.getWeeks()) {
-            if (hasProjectActivitiesInWeek(week) || hasRegularActivityInWeek(week)) {
+            int count = userInfo.numberOfProjectActivitiesByWeekNumber.getOrDefault(week, 0);
+            userInfo.numberOfProjectActivitiesByWeekNumber.put(week, count + 1);
+        }
+    }
+
+    private boolean hasProjectActivitiesInPeriod(Date date) {
+        for (Integer week : date.getWeeks()) {
+            if (hasProjectActivitiesInWeek(week)) {
                 return true;
             }
         }
         return false;
+    }
+
+    private boolean hasRegularActivitiesInPeriod(Date date) {
+        for (Integer week : date.getWeeks()) {
+            if (hasRegularActivityInWeek(week)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasAnyActivitiesInPeriod(Date date) {
+        return (hasProjectActivitiesInPeriod(date) || hasRegularActivitiesInPeriod(date));
     }
 
     public boolean hasRegularActivityTypeInPeriod(TypeRegularActivity type, Date date) {
@@ -57,8 +74,10 @@ public abstract class User {
         return true;
     }
 
-    public void registerRegularActivity(TypeRegularActivity type, Date date) {
-        regularActivityBehavior.register(userInfo, type, date);
+    public void registerRegularActivity(TypeRegularActivity type, Date date) throws OperationNotAllowedException {
+        if(!hasAnyActivitiesInPeriod(date))
+            regularActivityBehavior.register(userInfo, type, date);
+        else
+            throw new OperationNotAllowedException("Vacation/seminar cannot be registered as you have project-activities in those weeks");
     }
-
 }

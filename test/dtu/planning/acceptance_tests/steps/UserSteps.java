@@ -1,22 +1,23 @@
 package dtu.planning.acceptance_tests.steps;
 
+import dtu.planning.acceptance_tests.helper.*;
 import dtu.planning.application.PlanningTool;
-import dtu.planning.domain.Date;
-import dtu.planning.domain.Developer;
-import dtu.planning.domain.TypeRegularActivity;
-import dtu.planning.domain.User;
+import dtu.planning.domain.*;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class UserSteps {
     private PlanningTool planningTool;
     private User user;
+    private ErrorMessageHolder errorMessageHolder;
 
-    public UserSteps(PlanningTool planningTool) {
+    public UserSteps(PlanningTool planningTool, ErrorMessageHolder errorMessageHolder) {
         this.planningTool = planningTool;
+        this.errorMessageHolder = errorMessageHolder;
     }
 
     @Given("a developer is registered with the planningTool")
@@ -31,7 +32,11 @@ public class UserSteps {
 
     @When("the developer registers vacation from week {int} to {int}")
     public void theDeveloperRegistersVacationFromWeekTo(int fromWeek, int toWeek) {
-        user.registerRegularActivity(TypeRegularActivity.VACATION, new Date(fromWeek, toWeek));
+        try {
+            user.registerRegularActivity(TypeRegularActivity.VACATION, new Date(fromWeek, toWeek));
+        } catch (Exception e) {
+            errorMessageHolder.setErrorMessage(e.getMessage());
+        }
     }
 
     @Then("vacation is registered in the planningTool from week {int} to {int}")
@@ -44,36 +49,14 @@ public class UserSteps {
         assertTrue(user.isUnAvailable(new Date(fromWeek, toWeek)));
     }
 
-
-    @Given("the client is registered with the planningTool")
-    public void theClientIsRegisteredWithThePlanningTool() {
-        // Write code here that turns the phrase above into concrete actions
-        throw new io.cucumber.java.PendingException();
+    @Given("the developer has a project activity from week {int} to {int}")
+    public void theDeveloperHasAProjectActivityFromWeekTo(int fromWeek, int toWeek) {
+        user.addProjectActivity(new Date(fromWeek, toWeek));
     }
 
-    @When("the client requests to create an internal project")
-    public void theClientRequestsToCreateAnInternalProject() {
-        // Write code here that turns the phrase above into concrete actions
-        throw new io.cucumber.java.PendingException();
+    @Then("the error message {string} is given")
+    public void theErrorMessageIsGiven(String errorMessage) {
+        assertEquals(errorMessage, this.errorMessageHolder.getErrorMessage());
     }
 
-
-    @When("the client provides the project with name {string}")
-    public void theClientProvidesTheProjectWithName(String string) {
-        // Write code here that turns the phrase above into concrete actions
-        throw new io.cucumber.java.PendingException();
-    }
-
-    @Then("the planningTool creates an empty project")
-    public void thePlanningToolCreatesAnEmptyProject() {
-        // Write code here that turns the phrase above into concrete actions
-        throw new io.cucumber.java.PendingException();
-    }
-
-
-    @Then("the project is named {string}, has a project number and is internal")
-    public void theProjectIsNamedHasAProjectNumberAndIsInternal(String string) {
-        // Write code here that turns the phrase above into concrete actions
-        throw new io.cucumber.java.PendingException();
-    }
 }
