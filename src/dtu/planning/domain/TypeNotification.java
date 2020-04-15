@@ -1,6 +1,6 @@
-package dtu.planning.model;
+package dtu.planning.domain;
 
-public class NotificationType {
+public class TypeNotification {
     /**
      * Notification-types for the view-controller.
      * Might consider merging this with the app-folder in the end?
