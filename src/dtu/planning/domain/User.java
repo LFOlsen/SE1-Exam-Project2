@@ -75,7 +75,7 @@ public abstract class User {
     }
 
     public void registerRegularActivity(TypeRegularActivity type, Date date) throws OperationNotAllowedException {
-        if(!hasAnyActivitiesInPeriod(date))
+        if(!hasAnyActivitiesInPeriod(date) | (type == TypeRegularActivity.SICKNESS))
             regularActivityBehavior.register(userInfo, type, date);
         else
             throw new OperationNotAllowedException("Vacation/seminar cannot be registered as you have project-activities in those weeks");

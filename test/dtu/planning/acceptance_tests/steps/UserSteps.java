@@ -39,9 +39,23 @@ public class UserSteps {
         }
     }
 
+    @When("the developer registers sickness from week {int} to {int}")
+    public void theDeveloperRegistersSicknessFromWeekTo(int fromWeek, int toWeek) {
+        try {
+            user.registerRegularActivity(TypeRegularActivity.SICKNESS, new Date(fromWeek, toWeek));
+        } catch (Exception e) {
+            errorMessageHolder.setErrorMessage(e.getMessage());
+        }
+    }
+
     @Then("vacation is registered in the planningTool from week {int} to {int}")
     public void vacationIsRegisteredInThePlanningToolFromWeekTo(int fromWeek, int toWeek) {
         assertTrue(user.hasRegularActivityTypeInPeriod(TypeRegularActivity.VACATION, new Date(fromWeek, toWeek)));
+    }
+
+    @Then("sickness is registered in the planningTool from week {int} to {int}")
+    public void sicknessIsRegisteredInThePlanningToolFromWeekTo(int fromWeek, int toWeek) {
+        assertTrue(user.hasRegularActivityTypeInPeriod(TypeRegularActivity.SICKNESS, new Date(fromWeek, toWeek)));
     }
 
     @Then("the developer is unavailable from week {int} to {int}")

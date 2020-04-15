@@ -10,6 +10,14 @@ Feature: Register regular activities
     Then vacation is registered in the planningTool from week 12 to 14
     And the developer is unavailable from week 12 to 14
 
+  #Alternative scenario
+  Scenario: Developer registers sickness when assigned activities
+    Given a developer is registered with the planningTool
+    And the developer has a project activity from week 12 to 14
+    When the developer registers sickness from week 12 to 12
+    Then sickness is registered in the planningTool from week 12 to 12
+    And the developer is unavailable from week 12 to 12
+
   #Fail scenario
   Scenario: Developer registers vacation when unavailable
     Given a developer is registered with the planningTool
