@@ -4,80 +4,34 @@ public abstract class User {
 
     UserInfo userInfo;
     RegularActivityBehavior regularActivityBehavior;
-    private static final int MAX_WEEKLY_PROJECT_ACTIVITIES = 20;
-
 
     public User(String uID) {
         userInfo = new UserInfo(uID);
     }
 
-    private boolean hasProjectActivitiesInWeek(int week) {
-        return userInfo.numberOfProjectActivitiesByWeekNumber.getOrDefault(week, 0) > 0;
+    private boolean hasRegularActivitiesWithinPeriod(DateField period) {
+        return userInfo.regularActivities.stream().anyMatch(r -> r.isWithin(period));
     }
 
-    private boolean hasMaxProjectActivitiesInWeek(int week) {
-        return userInfo.numberOfProjectActivitiesByWeekNumber.getOrDefault(week, 0) > MAX_WEEKLY_PROJECT_ACTIVITIES;
+    public boolean hasAnyActivitiesWithinPeriod(DateField period) {
+        /**
+         * Add check for project-activities within period when that bit is implemented
+         */
+        return hasRegularActivitiesWithinPeriod(period);
     }
 
-    private boolean hasRegularActivityInWeek(int week) {
-        return userInfo.regularActivityByWeekNumber.containsKey(week);
+    public boolean containsRegularActivity(RegularActivity regularActivity) {
+        return userInfo.regularActivities.stream().anyMatch(r -> r.equals(regularActivity));
     }
 
-    private boolean hasRegularActivityTypeInWeek(TypeRegularActivity type, int week) {
-        return (userInfo.regularActivityByWeekNumber.get(week) == type);
+    public boolean isUnAvailable(DateField period) {
+        /**
+         * Add check for > 20 project-activities as well when that bit is implemented
+         */
+        return hasRegularActivitiesWithinPeriod(period);
     }
 
-    public void addProjectActivity(Date date) {
-        for (Integer week : date.getWeeks()) {
-            int count = userInfo.numberOfProjectActivitiesByWeekNumber.getOrDefault(week, 0);
-            userInfo.numberOfProjectActivitiesByWeekNumber.put(week, count + 1);
-        }
-    }
-
-    private boolean hasProjectActivitiesInPeriod(Date date) {
-        for (Integer week : date.getWeeks()) {
-            if (hasProjectActivitiesInWeek(week)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean hasRegularActivitiesInPeriod(Date date) {
-        for (Integer week : date.getWeeks()) {
-            if (hasRegularActivityInWeek(week)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean hasAnyActivitiesInPeriod(Date date) {
-        return (hasProjectActivitiesInPeriod(date) || hasRegularActivitiesInPeriod(date));
-    }
-
-    public boolean hasRegularActivityTypeInPeriod(TypeRegularActivity type, Date date) {
-        for (Integer week : date.getWeeks()) {
-            if (!hasRegularActivityTypeInWeek(type, week)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public boolean isUnAvailable(Date date) {
-        for (Integer week : date.getWeeks()) {
-            if (!(hasRegularActivityInWeek(week) | hasMaxProjectActivitiesInWeek(week))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public void registerRegularActivity(TypeRegularActivity type, Date date) throws OperationNotAllowedException {
-        if(!hasAnyActivitiesInPeriod(date) | (type == TypeRegularActivity.SICKNESS))
-            regularActivityBehavior.register(userInfo, type, date);
-        else
-            throw new OperationNotAllowedException("Vacation/seminar cannot be registered as you have project-activities in those weeks");
+    public void registerRegularActivity(RegularActivity regularActivity) throws OperationNotAllowedException {
+        regularActivityBehavior.register(this, regularActivity);
     }
 }

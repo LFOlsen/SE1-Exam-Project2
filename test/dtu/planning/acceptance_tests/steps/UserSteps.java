@@ -7,8 +7,8 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 public class UserSteps {
     private PlanningTool planningTool;
@@ -20,52 +20,51 @@ public class UserSteps {
         this.errorMessageHolder = errorMessageHolder;
     }
 
-    @Given("a developer is registered with the planningTool")
-    public void aDeveloperIsRegisteredWithThePlanningTool() {
+    @Given("the registered user is a developer")
+    public void theRegisteredUserIsADeveloper() {
         user = new Developer("test");
     }
 
-    @Given("the developer has no activities from week {int} to {int}")
-    public void theDeveloperHasNoActivitiesFromWeekTo(int fromWeek, int toWeek) {
-        assertFalse(user.hasAnyActivitiesInPeriod(new Date(fromWeek, toWeek)));
+    @Given("the registered user is a client")
+    public void theRegisteredUserIsAClient() {
+        user = new Client("test");
     }
 
-    @When("the developer registers vacation from week {int} to {int}")
-    public void theDeveloperRegistersVacationFromWeekTo(int fromWeek, int toWeek) {
+    @Given("the user has no activities from {string} to {string}")
+    public void theUserHasNoActivitiesFromTo(String dateStart, String dateEnd) {
+        DateField period = new DateField(dateStart, dateEnd);
+        assertFalse(user.hasAnyActivitiesWithinPeriod(period));
+    }
+
+    @When("the user registers vacation from {string} to {string}")
+    public void theUserRegistersVacationFromTo(String dateStart, String dateEnd) {
         try {
-            user.registerRegularActivity(TypeRegularActivity.VACATION, new Date(fromWeek, toWeek));
+            user.registerRegularActivity(new RegularActivity(TypeRegularActivity.VACATION, new DateField(dateStart, dateEnd)));
         } catch (Exception e) {
             errorMessageHolder.setErrorMessage(e.getMessage());
         }
     }
 
-    @When("the developer registers sickness from week {int} to {int}")
-    public void theDeveloperRegistersSicknessFromWeekTo(int fromWeek, int toWeek) {
-        try {
-            user.registerRegularActivity(TypeRegularActivity.SICKNESS, new Date(fromWeek, toWeek));
-        } catch (Exception e) {
-            errorMessageHolder.setErrorMessage(e.getMessage());
-        }
+    @Then("vacation is registered in the planningTool from {string} to {string}")
+    public void vacationIsRegisteredInThePlanningToolFromTo(String dateStart, String dateEnd) {
+        RegularActivity r = new RegularActivity(TypeRegularActivity.VACATION, new DateField(dateStart, dateEnd));
+        assertTrue(user.containsRegularActivity(r));
     }
 
-    @Then("vacation is registered in the planningTool from week {int} to {int}")
-    public void vacationIsRegisteredInThePlanningToolFromWeekTo(int fromWeek, int toWeek) {
-        assertTrue(user.hasRegularActivityTypeInPeriod(TypeRegularActivity.VACATION, new Date(fromWeek, toWeek)));
+    @Then("the user is unavailable from {string} to {string}")
+    public void theUserIsUnavailableFromTo(String dateStart, String dateEnd) {
+        assertTrue(user.isUnAvailable(new DateField(dateStart, dateEnd)));
     }
 
-    @Then("sickness is registered in the planningTool from week {int} to {int}")
-    public void sicknessIsRegisteredInThePlanningToolFromWeekTo(int fromWeek, int toWeek) {
-        assertTrue(user.hasRegularActivityTypeInPeriod(TypeRegularActivity.SICKNESS, new Date(fromWeek, toWeek)));
-    }
 
-    @Then("the developer is unavailable from week {int} to {int}")
-    public void theDeveloperIsUnavailableFromWeekTo(int fromWeek, int toWeek) {
-        assertTrue(user.isUnAvailable(new Date(fromWeek, toWeek)));
-    }
-
-    @Given("the developer has a project activity from week {int} to {int}")
-    public void theDeveloperHasAProjectActivityFromWeekTo(int fromWeek, int toWeek) {
-        user.addProjectActivity(new Date(fromWeek, toWeek));
+    @Given("the user has one activity from {string} to {string}")
+    public void theUserHasOneActivityFromTo(String dateStart, String dateEnd) throws OperationNotAllowedException {
+        /**
+         * Change this so the developer has one PROJECT-activity, not a regular activity...
+         */
+        RegularActivity activity = new RegularActivity(TypeRegularActivity.VACATION, new DateField(dateStart, dateEnd));
+        user.registerRegularActivity(activity);
+        assertTrue(user.containsRegularActivity(activity));
     }
 
     @Then("the error message {string} is given")
@@ -73,4 +72,19 @@ public class UserSteps {
         assertEquals(errorMessage, this.errorMessageHolder.getErrorMessage());
     }
 
+    @When("the user registers sickness from {string} to {string}")
+    public void theUserRegistersSicknessFromTo(String dateStart, String dateEnd) throws OperationNotAllowedException {
+        RegularActivity activity = new RegularActivity(TypeRegularActivity.SICKNESS, new DateField(dateStart, dateEnd));
+        user.registerRegularActivity(activity);
+        assertTrue(user.containsRegularActivity(activity));
+    }
+
+    @Then("sickness is registered in the planningTool from {string} to {string}")
+    public void sicknessIsRegisteredInThePlanningToolFromTo(String dateStart, String dateEnd) {
+        /**
+         * Can we use enums in cucumber?
+         */
+        RegularActivity r = new RegularActivity(TypeRegularActivity.SICKNESS, new DateField(dateStart, dateEnd));
+        assertTrue(user.containsRegularActivity(r));
+    }
 }

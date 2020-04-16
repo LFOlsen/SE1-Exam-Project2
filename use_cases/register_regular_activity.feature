@@ -1,26 +1,32 @@
 Feature: Register regular activities
-  Description: A developer registers a regular activity
-  Actors: Developer
+  Description: A user of type developer registers a regular activity
+  Actors: User of type developer
 
   #Main scenario
   Scenario: Developer registers vacation when available
-    Given a developer is registered with the planningTool
-    And the developer has no activities from week 12 to 14
-    When the developer registers vacation from week 12 to 14
-    Then vacation is registered in the planningTool from week 12 to 14
-    And the developer is unavailable from week 12 to 14
+    Given the registered user is a developer
+    And the user has no activities from "01/04/2020" to "10/04/2020"
+    When the user registers vacation from "01/04/2020" to "10/04/2020"
+    Then vacation is registered in the planningTool from "01/04/2020" to "10/04/2020"
+    And the user is unavailable from "01/04/2020" to "10/04/2020"
 
   #Alternative scenario
   Scenario: Developer registers sickness when assigned activities
-    Given a developer is registered with the planningTool
-    And the developer has a project activity from week 12 to 14
-    When the developer registers sickness from week 12 to 12
-    Then sickness is registered in the planningTool from week 12 to 12
-    And the developer is unavailable from week 12 to 12
+    Given the registered user is a developer
+    And the user has one activity from "01/04/2020" to "10/04/2020"
+    When the user registers sickness from "01/04/2020" to "02/04/2020"
+    Then sickness is registered in the planningTool from "01/04/2020" to "02/04/2020"
+    And the user is unavailable from "01/04/2020" to "02/04/2020"
 
-  #Fail scenario
+  #Fail scenario #1
   Scenario: Developer registers vacation when unavailable
-    Given a developer is registered with the planningTool
-    And the developer has a project activity from week 12 to 14
-    When the developer registers vacation from week 12 to 14
-    Then the error message "Vacation/seminar cannot be registered as you have project-activities in those weeks" is given
+    Given the registered user is a developer
+    And the user has one activity from "01/04/2020" to "10/04/2020"
+    When the user registers vacation from "01/04/2020" to "10/04/2020"
+    Then the error message "Regular activity cannot be registered due to other activities occurring in that period" is given
+
+  #Fail scenario #2
+  Scenario: Client registers vacation
+    Given the registered user is a client
+    When the user registers vacation from "01/04/2020" to "10/04/2020"
+    Then the error message "A client cannot register a regular activity" is given
